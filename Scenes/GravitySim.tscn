@@ -1,0 +1,44 @@
+[gd_scene load_steps=8 format=3 uid="uid://u18cry12m86n"]
+
+[ext_resource type="Script" uid="uid://br3j5338eewqj" path="res://Scripts/ObjectScripts/GravitySim.cs" id="1_40fux"]
+[ext_resource type="Script" uid="uid://3qnmwdecrfky" path="res://Scripts/ObjectScripts/CameraControls.cs" id="1_nv1n8"]
+[ext_resource type="PackedScene" uid="uid://r3pio231mw2r" path="res://Scenes/SpacetimeGrid.tscn" id="3_n7ccm"]
+[ext_resource type="PackedScene" uid="uid://btk22j7bntc6y" path="res://Scenes/GvObject.tscn" id="4_upvvv"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_upvvv"]
+sky_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
+ground_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
+
+[sub_resource type="Sky" id="Sky_mrwfx"]
+sky_material = SubResource("ProceduralSkyMaterial_upvvv")
+
+[sub_resource type="Environment" id="Environment_xf628"]
+background_mode = 2
+sky = SubResource("Sky_mrwfx")
+tonemap_mode = 2
+glow_enabled = true
+
+[node name="GravitySim" type="Node3D"]
+script = ExtResource("1_40fux")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_xf628")
+
+[node name="User" type="Camera3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0.233445, -0.97237, 0, 0.97237, 0.233445, 1, 1.02042e-08, -4.25036e-08, -5, 3, 0)
+script = ExtResource("1_nv1n8")
+
+[node name="SpacetimeGrid" parent="." instance=ExtResource("3_n7ccm")]
+
+[node name="Sun" parent="SpacetimeGrid" instance=ExtResource("4_upvvv")]
+transform = Transform3D(1, 0, 0, 0, 0.97237, 0.233445, 0, -0.233445, 0.97237, 0, 0, 0)
+Mass = 7.3
+
+[node name="Planet" parent="SpacetimeGrid" instance=ExtResource("4_upvvv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.25, 0)
+Velocity = 5.0
+Mass = 7.3

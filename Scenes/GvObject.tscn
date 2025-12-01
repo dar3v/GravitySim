@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://btk22j7bntc6y"]
+
+[ext_resource type="Script" uid="uid://b2ahgc1jc18u" path="res://Scripts/ObjectScripts/GvObject.cs" id="1_sk7su"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_5w8yt"]
+
+[node name="GvObject" type="Node3D"]
+script = ExtResource("1_sk7su")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_5w8yt")
