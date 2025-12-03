@@ -1,5 +1,6 @@
 using Godot;
 
-public partial class SpacetimeGrid : MeshInstance3D
+public partial class SpacetimeGrid : Node3D 
 {
+    
 }
