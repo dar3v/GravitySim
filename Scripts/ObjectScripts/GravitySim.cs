@@ -12,9 +12,9 @@ public partial class GravitySim : Node3D
 
     public override void _Process(double delta)
     {
-        foreach (var obj in Globals.GvObjects)
+        foreach (var obj in Globals.GetAllGvObjects())
         {
-            foreach (var obj2 in Globals.GvObjects)
+            foreach (var obj2 in Globals.GetAllGvObjects())
             {
                 if (obj2 == obj) { continue; };
 
