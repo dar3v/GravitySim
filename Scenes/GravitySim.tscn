@@ -29,18 +29,24 @@ shadow_enabled = true
 environment = SubResource("Environment_xf628")
 
 [node name="User" type="Camera3D" parent="."]
-transform = Transform3D(-4.37114e-08, 0.233445, -0.97237, 0, 0.97237, 0.233445, 1, 1.02042e-08, -4.25036e-08, -5, 7, 0)
+transform = Transform3D(-3.68095e-08, 0.720998, -0.692937, 2.35742e-08, 0.692937, 0.720998, 1, 1.02042e-08, -4.25036e-08, -9.12088, 30.8206, 0)
 current = true
 script = ExtResource("1_nv1n8")
 
 [node name="SpacetimeGrid" parent="." instance=ExtResource("3_n7ccm")]
 
-[node name="Planet2" parent="SpacetimeGrid" instance=ExtResource("4_upvvv")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.99961, 4.98962, -0.007164)
-Mass = 10.0
-InitialVelocity = Vector3(4, 0, 0)
+[node name="Sun" parent="SpacetimeGrid" instance=ExtResource("4_upvvv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+Mass = 198.9
+Radius = 0.696
 
 [node name="Planet" parent="SpacetimeGrid" instance=ExtResource("4_upvvv")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 5, 0)
-Mass = 10.0
-InitialVelocity = Vector3(-4, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 149.6, 5, 0)
+Mass = 5.972
+Radius = 0.006
+InitialVelocity = Vector3(0, 0, -29.78)
+
+[node name="Moon" parent="SpacetimeGrid" instance=ExtResource("4_upvvv")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 149.6, 5, 2.5)
+Mass = 0.073
+Radius = 1.022
