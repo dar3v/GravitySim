@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 public partial class Globals : Node
 {
-    public const float G = 0.1f; // Gravitational constant
-    public const float SchwarzG = 1.0f; // Schwarzschild
-    public const float CSquared = 1.0f; // Speed of light squared
+    // public const float G = 0.1f; // Gravitational constant
+    // public const float SchwarzG = 1.0f; // Schwarzschild
+    // public const float CSquared = 1.0f; // Speed of light squared
     
     private static readonly List<GvObject> _gvObjects = [];
 

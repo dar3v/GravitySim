@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=3 uid="uid://u18cry12m86n"]
 
 [ext_resource type="Script" uid="uid://br3j5338eewqj" path="res://Scripts/ObjectScripts/GravitySim.cs" id="1_40fux"]
-[ext_resource type="Script" uid="uid://3qnmwdecrfky" path="res://Scripts/ObjectScripts/CameraControls.cs" id="1_nv1n8"]
+[ext_resource type="Script" uid="uid://c4dtv147byhpr" path="res://Scripts/User.cs" id="2_upvvv"]
 [ext_resource type="PackedScene" uid="uid://r3pio231mw2r" path="res://Scenes/Objects/SpacetimeGrid.tscn" id="3_n7ccm"]
 [ext_resource type="PackedScene" uid="uid://btk22j7bntc6y" path="res://Scenes/Objects/GvObject.tscn" id="4_upvvv"]
 
@@ -29,24 +29,20 @@ shadow_enabled = true
 environment = SubResource("Environment_xf628")
 
 [node name="User" type="Camera3D" parent="."]
-transform = Transform3D(-3.68095e-08, 0.720998, -0.692937, 2.35742e-08, 0.692937, 0.720998, 1, 1.02042e-08, -4.25036e-08, -9.12088, 30.8206, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 5)
 current = true
-script = ExtResource("1_nv1n8")
+script = ExtResource("2_upvvv")
 
 [node name="SpacetimeGrid" parent="." instance=ExtResource("3_n7ccm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, 0)
+GridResolution = 50
+PlaneSize = 100.0
+CurvatureScale = 0.1
 
-[node name="Sun" parent="SpacetimeGrid" instance=ExtResource("4_upvvv")]
+[node name="GvObject" parent="." instance=ExtResource("4_upvvv")]
+Mass = 5.0
+
+[node name="GvObject2" parent="." instance=ExtResource("4_upvvv")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
-Mass = 198.9
-Radius = 0.696
-
-[node name="Planet" parent="SpacetimeGrid" instance=ExtResource("4_upvvv")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 149.6, 5, 0)
-Mass = 5.972
-Radius = 0.006
-InitialVelocity = Vector3(0, 0, -29.78)
-
-[node name="Moon" parent="SpacetimeGrid" instance=ExtResource("4_upvvv")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 149.6, 5, 2.5)
-Mass = 0.073
-Radius = 1.022
+Mass = 5.0
+InitialVelocity = Vector3(1, 0, 0)

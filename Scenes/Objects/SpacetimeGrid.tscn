@@ -1,12 +1,9 @@
 [gd_scene load_steps=3 format=3 uid="uid://r3pio231mw2r"]
 
+[ext_resource type="Material" uid="uid://b30fcnrk0k5x6" path="res://Scripts/ObjectScripts/SpacetimeGrid.tres" id="1_jkdm3"]
 [ext_resource type="Script" uid="uid://ct85aa4qphf64" path="res://Scripts/ObjectScripts/SpacetimeGrid.cs" id="1_kof72"]
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_dshf3"]
-
-[node name="SpacetimeGrid" type="Node3D"]
+[node name="SpacetimeGrid" type="MeshInstance3D"]
+material_override = ExtResource("1_jkdm3")
 script = ExtResource("1_kof72")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(20, 0, 0, 0, 20, 0, 0, 0, 20, 0, 0, 0)
-mesh = SubResource("PlaneMesh_dshf3")
+PlaneSize = 50.0

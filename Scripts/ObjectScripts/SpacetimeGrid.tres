@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://b30fcnrk0k5x6"]
+
+[ext_resource type="Shader" uid="uid://bgxs2f6di31i" path="res://Scripts/ObjectScripts/SpacetimeGrid.gdshader" id="1_ov3iv"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_ov3iv")
+shader_parameter/cell_size = 0.0
+shader_parameter/camera_pos = Vector3(0, 0, 0)
+shader_parameter/object_count = 0
+shader_parameter/object_positions = PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/object_masses = PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/curvature_scale = 0.0
