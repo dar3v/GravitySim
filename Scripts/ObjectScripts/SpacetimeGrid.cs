@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 public partial class SpacetimeGrid : MeshInstance3D
 {
-    [Export] public int GridResolution = 10;  // Resolution of the grid (number of cells in each axis)
-    [Export] public float PlaneSize = 10f;    // Size of the grid (total width/height of the grid)
-    [Export] public float CurvatureScale = 0.05f;  // How strongly the mass affects curvature
+    [Export] public int GridResolution = 50;  // Resolution of the grid (number of cells in each axis)
+    [Export] public float PlaneSize = 100f;    // Size of the grid (total width/height of the grid)
+    [Export] public float CurvatureScale = 0.01f;  // How strongly the mass affects curvature
 
     private List<GvObject> objs;  // List of all the objects that affect the curvature
     private ShaderMaterial gridMaterial; // Reference to the ShaderMaterial
@@ -13,6 +13,8 @@ public partial class SpacetimeGrid : MeshInstance3D
     public override void _Ready()
     {
         objs = Globals.GetAllGvObjects();
+        Globals.ObjectsChanged += RefreshObjects;
+
         // Ensure MaterialOverride is a ShaderMaterial and fetch the reference
         if (MaterialOverride is ShaderMaterial mat)
         {
@@ -29,6 +31,16 @@ public partial class SpacetimeGrid : MeshInstance3D
         GenerateGridMesh();
     }
 
+    private void RefreshObjects()
+    {
+        objs = Globals.GetAllGvObjects();
+    }
+
+    public override void _ExitTree()
+    {
+        Globals.ObjectsChanged -= RefreshObjects;
+    }
+
     public override void _Process(double delta)
     {
         // Ensure gridMaterial is not null before using it
@@ -42,7 +54,7 @@ public partial class SpacetimeGrid : MeshInstance3D
             }
 
             // Pass object data to the shader for curvature calculation
-            int objCount = objs.Count;
+            int objCount = Mathf.Min(objs.Count, 16);
             gridMaterial.SetShaderParameter("object_count", objCount);
 
             Vector3[] objectPositions = new Vector3[16];  // max 16 objects for this example

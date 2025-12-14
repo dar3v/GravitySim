@@ -1,74 +1,106 @@
-using System;
-using System.Collections.Generic;
 using Godot;
+using System.Collections.Generic;
 
 public partial class GravitySim : Node3D
 {
-    [Export] public float G = 6.6743f; // gravitational constant
+    [Export] public float G = 1.0f;
+    [Export] public float Softening = 0.01f;
+    [Export] public bool RemoveCenterOfMassDrift = true;
 
-    public override void _Process(double delta)
+    private Vector3[] _accelerations;
+
+    public override void _PhysicsProcess(double delta)
     {
         float dt = (float)delta;
+
         List<GvObject> objs = Globals.GetAllGvObjects();
         int count = objs.Count;
+        if (count < 2)
+            return;
 
-        // store computed accelerations per object
-        Vector3[] accelerations = new Vector3[count];
+        EnsureAccelerationBuffer(count);
 
-        // pairwise loop, O(N^2) time complexity, O(N) space complexity
-        // TODO: move ts comment to docu 🦖
+        // --- First acceleration pass ---
+        ComputeAccelerations(objs);
+
+        // --- Half-step velocity update ---
+        for (int i = 0; i < count; i++)
+            objs[i].Velocity += _accelerations[i] * (0.5f * dt);
+
+        // --- Position update ---
+        for (int i = 0; i < count; i++)
+            objs[i].GlobalPosition += objs[i].Velocity * dt;
+
+        // --- Recompute accelerations ---
+        ComputeAccelerations(objs);
+
+        // --- Final velocity update ---
+        for (int i = 0; i < count; i++)
+            objs[i].Velocity += _accelerations[i] * (0.5f * dt);
+
+        if (RemoveCenterOfMassDrift)
+            StabilizeCenterOfMass(objs);
+    }
+
+    private void ComputeAccelerations(List<GvObject> objs)
+    {
+        int count = objs.Count;
+
+        // Clear acceleration buffer
+        for (int i = 0; i < count; i++)
+            _accelerations[i] = Vector3.Zero;
+
+        float softSq = Softening * Softening;
+
         for (int i = 0; i < count; i++)
         {
+            GvObject a = objs[i];
+
             for (int j = i + 1; j < count; j++)
             {
-                var obj1 = objs[i];
-                var obj2 = objs[j];
+                GvObject b = objs[j];
 
-                Vector3 offset = obj2.GlobalPosition - obj1.GlobalPosition;
-                float distanceSq = offset.LengthSquared();
+                Vector3 offset = b.GlobalPosition - a.GlobalPosition;
+                float distSq = offset.LengthSquared() + softSq;
 
-                if (distanceSq < 0.0001f) continue; // avoid singularities
+                float dist = Mathf.Sqrt(distSq);
+                float invDist = 1.0f / dist;
+                float invDist3 = invDist * invDist * invDist;
 
-                // F = (G * M_1 * M_2) / r^2
-                float gforce = G * obj1.Mass * obj2.Mass / distanceSq;
+                Vector3 forceDir = offset * invDist3;
 
-                float distance = MathF.Sqrt(distanceSq); // idk why this is but yes
-                Vector3 direction = offset / distance;
+                Vector3 accA = forceDir * (G * b.Mass);
+                Vector3 accB = forceDir * (G * a.Mass);
 
-                // a = F / m
-                Vector3 acc1 = direction * (gforce / obj1.Mass);
-                Vector3 acc2 = direction * (gforce / obj2.Mass);
-
-                accelerations[i] += acc1;
-                accelerations[j] -= acc2;
+                _accelerations[i] += accA;
+                _accelerations[j] -= accB;
             }
         }
+    }
 
-        // update velocities
-        for (int i = 0; i < count; i++)
+    private static void StabilizeCenterOfMass(List<GvObject> objs)
+    {
+        Vector3 totalMomentum = Vector3.Zero;
+        float totalMass = 0f;
+
+        foreach (var o in objs)
         {
-            objs[i].Velocity += accelerations[i] * dt;
-        }
-        
-        // update positions
-        for (int i = 0; i < count; i++)
-        {
-            objs[i].GlobalPosition += objs[i].Velocity * dt;
-            GD.Print($"Updating Position: {objs[i].GlobalPosition}");
+            totalMomentum += o.Velocity * o.Mass;
+            totalMass += o.Mass;
         }
 
-        // if (obj2 == obj) { continue; };
+        if (totalMass <= 0f)
+            return;
 
-        // float dx = obj.Position.X - obj2.Position.X;
-        // float dz = obj.Position.Z - obj2.Position.Z;
-        // float distance = MathF.Sqrt(dx*dx + dz*dz);
-        // Vector3 direction = new(dx / distance, 0, dz / distance);
+        Vector3 drift = totalMomentum / totalMass;
 
-        // float gforce = G * obj.Mass * obj2.Mass / (distance * distance);
-        // float acc1 = gforce / obj.Mass;
-        // Vector3 acc = new(acc1 * direction.X, 0, acc1 * direction.Z);
+        foreach (var o in objs)
+            o.Velocity -= drift;
+    }
 
-        // obj.GlobalPosition += acc;
-        // GD.Print($"{obj.Position}");
+    private void EnsureAccelerationBuffer(int count)
+    {
+        if (_accelerations == null || _accelerations.Length != count)
+            _accelerations = new Vector3[count];
     }
 }

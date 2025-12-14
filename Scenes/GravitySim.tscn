@@ -1,9 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://u18cry12m86n"]
+[gd_scene load_steps=9 format=3 uid="uid://u18cry12m86n"]
 
 [ext_resource type="Script" uid="uid://br3j5338eewqj" path="res://Scripts/ObjectScripts/GravitySim.cs" id="1_40fux"]
 [ext_resource type="Script" uid="uid://c4dtv147byhpr" path="res://Scripts/User.cs" id="2_upvvv"]
 [ext_resource type="PackedScene" uid="uid://r3pio231mw2r" path="res://Scenes/Objects/SpacetimeGrid.tscn" id="3_n7ccm"]
 [ext_resource type="PackedScene" uid="uid://btk22j7bntc6y" path="res://Scenes/Objects/GvObject.tscn" id="4_upvvv"]
+[ext_resource type="PackedScene" uid="uid://cerkvx2po5u4n" path="res://Scenes/Objects/UI.tscn" id="5_mrwfx"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_upvvv"]
 sky_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
@@ -13,7 +14,7 @@ ground_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
 sky_material = SubResource("ProceduralSkyMaterial_upvvv")
 
 [sub_resource type="Environment" id="Environment_xf628"]
-background_mode = 2
+background_energy_multiplier = 0.0
 sky = SubResource("Sky_mrwfx")
 tonemap_mode = 2
 glow_enabled = true
@@ -21,9 +22,14 @@ glow_enabled = true
 [node name="GravitySim" type="Node3D"]
 script = ExtResource("1_40fux")
 
+[node name="UI" parent="." instance=ExtResource("5_mrwfx")]
+visible = false
+
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
+visible = false
 shadow_enabled = true
+sky_mode = 1
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_xf628")
@@ -35,14 +41,14 @@ script = ExtResource("2_upvvv")
 
 [node name="SpacetimeGrid" parent="." instance=ExtResource("3_n7ccm")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5, 0)
-GridResolution = 50
+GridResolution = 75
 PlaneSize = 100.0
-CurvatureScale = 0.1
 
 [node name="GvObject" parent="." instance=ExtResource("4_upvvv")]
-Mass = 5.0
+Density = 0.1
+Mass = 100.0
 
 [node name="GvObject2" parent="." instance=ExtResource("4_upvvv")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
-Mass = 5.0
-InitialVelocity = Vector3(1, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -10)
+InitialVelocity = Vector3(2, 0, 0)
+Mass = 100.0

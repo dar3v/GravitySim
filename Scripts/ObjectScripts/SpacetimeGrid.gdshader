@@ -1,6 +1,6 @@
 shader_type spatial;
+render_mode unshaded;
 
-uniform float cell_size : hint_range(0.01, 10.0);
 uniform int object_count;
 uniform vec3 object_positions[16]; // Max 16 objects
 uniform float object_masses[16];

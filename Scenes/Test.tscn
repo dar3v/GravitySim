@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://cpwm4g1fi7x1b"]
+
+[ext_resource type="Script" uid="uid://c4dtv147byhpr" path="res://Scripts/User.cs" id="1_0dy5s"]
+[ext_resource type="PackedScene" uid="uid://r3pio231mw2r" path="res://Scenes/Objects/SpacetimeGrid.tscn" id="1_gxb1y"]
+[ext_resource type="PackedScene" uid="uid://btk22j7bntc6y" path="res://Scenes/Objects/GvObject.tscn" id="2_0dy5s"]
+
+[node name="Test" type="Node3D"]
+
+[node name="User" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 5)
+current = true
+script = ExtResource("1_0dy5s")
+
+[node name="SpacetimeGrid" parent="." instance=ExtResource("1_gxb1y")]
+
+[node name="GvObject2" parent="." instance=ExtResource("2_0dy5s")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
+
+[node name="GvObject" parent="." instance=ExtResource("2_0dy5s")]

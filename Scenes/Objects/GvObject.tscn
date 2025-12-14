@@ -1,11 +1,23 @@
-[gd_scene load_steps=3 format=3 uid="uid://btk22j7bntc6y"]
+[gd_scene load_steps=5 format=3 uid="uid://btk22j7bntc6y"]
 
 [ext_resource type="Script" uid="uid://b2ahgc1jc18u" path="res://Scripts/ObjectScripts/GvObject.cs" id="1_sk7su"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_t7vmh"]
+emission_enabled = true
+emission = Color(0.8, 0.8, 0.56, 1)
+
 [sub_resource type="SphereMesh" id="SphereMesh_5w8yt"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_t7vmh"]
 
 [node name="GvObject" type="Node3D"]
 script = ExtResource("1_sk7su")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+material_override = SubResource("StandardMaterial3D_t7vmh")
 mesh = SubResource("SphereMesh_5w8yt")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+shape = SubResource("SphereShape3D_t7vmh")
