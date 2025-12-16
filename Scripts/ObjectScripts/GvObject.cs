@@ -34,17 +34,27 @@ public partial class GvObject : Node3D
 
     public override void _Ready()
     {
-        _meshInstance = GetChild<MeshInstance3D>(0);
+        _meshInstance = GetNodeOrNull<MeshInstance3D>("Mesh");
+        if (_meshInstance == null)
+        {
+            GD.PushError("GvObject missing MeshInstance3D child");
+            return;
+        }
+
         Velocity = InitialVelocity;
 
-        // sanity check collision mask and layer
-        _body = GetNode<StaticBody3D>("StaticBody3D");
-        _body.SetMeta("owner", this);
-        _body.CollisionMask = 1;
-        _body.CollisionLayer = 1;
+        _light = new OmniLight3D
+        {
+            LightColor = Colors.White
+        };
+        AddChild(_light);
 
-        SetupMaterials();
-        SetupLight();
+        if (_meshInstance.MaterialOverride is StandardMaterial3D mat)
+        {
+            mat.EmissionEnabled = true;
+            mat.Emission = Colors.White;
+            mat.EmissionEnergyMultiplier = 2.0f;
+        }
 
         Globals.AddGvObject(this);
         UpdateGvObject();
@@ -53,6 +63,12 @@ public partial class GvObject : Node3D
     public override void _ExitTree()
     {
         Globals.RmGvObject(this);
+    }
+
+    public override void _EnterTree()
+    {
+        if (GetChildCount() == 0)
+            GD.PushWarning($"{Name} instantiated without children. Use PackedScene.");
     }
 
     private void SetupMaterials()

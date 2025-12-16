@@ -13,7 +13,7 @@ emission = Color(0.8, 0.8, 0.56, 1)
 [node name="GvObject" type="Node3D"]
 script = ExtResource("1_sk7su")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="Mesh" type="MeshInstance3D" parent="."]
 material_override = SubResource("StandardMaterial3D_t7vmh")
 mesh = SubResource("SphereMesh_5w8yt")
 

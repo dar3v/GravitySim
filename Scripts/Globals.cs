@@ -37,4 +37,10 @@ public partial class Globals : Node
     {
         return _gvObjects;
     }
+
+    public static void ClearAll()
+    {
+        _gvObjects.Clear();
+        ObjectsChanged?.Invoke();
+    }
 }

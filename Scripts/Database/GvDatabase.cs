@@ -124,7 +124,7 @@ public static class GvDatabase
 
             objCmd.Parameters.AddWithValue("$sid", simId);
             objCmd.Parameters.AddWithValue("$mesh", obj.MeshId);
-            objCmd.Parameters.AddWithValue("$name", obj.Name);
+            objCmd.Parameters.AddWithValue("$name", obj.Name.ToString());
             objCmd.Parameters.AddWithValue("$mass", obj.Mass);
             objCmd.Parameters.AddWithValue("$density", obj.Density);
 
@@ -140,5 +140,176 @@ public static class GvDatabase
         }
 
         transaction.Commit();
+    }
+
+    public static void LoadSimulation(
+        int simulationId,
+        GravitySim sim,
+        Node3D parent
+    )
+    {
+        ClearCurrentSimulation(parent);
+        if (parent == null)
+        {
+            GD.PushError("LoadSimulation: parent is null");
+            return;
+        }
+
+        PackedScene gvScene =
+            GD.Load<PackedScene>("res://Scenes/Objects/GvObject.tscn");
+
+        if (gvScene == null)
+        {
+            GD.PushError("LoadSimulation: Failed to load GvObject.tscn");
+            return;
+        }
+
+        using var connection = new SqliteConnection(ConnectionString);
+        connection.Open();
+
+        var cmd = connection.CreateCommand();
+        cmd.CommandText = """
+        SELECT
+            name, mass, density,
+            pos_x, pos_y, pos_z,
+            vel_x, vel_y, vel_z
+        FROM objects
+        WHERE simulation_id = $sid;
+    """;
+        cmd.Parameters.AddWithValue("$sid", simulationId);
+
+        using var reader = cmd.ExecuteReader();
+
+        while (reader.Read())
+        {
+            var obj = gvScene.Instantiate<GvObject>();
+            parent.AddChild(obj);
+
+            obj.Name = reader.GetString(0);
+            obj.Mass = reader.GetFloat(1);
+            obj.Density = reader.GetFloat(2);
+
+            obj.GlobalPosition = new Vector3(
+                reader.GetFloat(3),
+                reader.GetFloat(4),
+                reader.GetFloat(5)
+            );
+
+            obj.Velocity = new Vector3(
+                reader.GetFloat(6),
+                reader.GetFloat(7),
+                reader.GetFloat(8)
+            );
+        }
+
+        GD.Print($"Loaded simulation {simulationId}");
+    }
+
+    public static List<SimulationInfo> ListSimulations()
+    {
+        var result = new List<SimulationInfo>();
+
+        using var connection = new SqliteConnection(ConnectionString);
+        connection.Open();
+
+        using var cmd = connection.CreateCommand();
+        cmd.CommandText = """
+        SELECT
+            id,
+            name,
+            g_constant,
+            created_at
+        FROM simulations
+        ORDER BY created_at DESC;
+    """;
+
+        using var reader = cmd.ExecuteReader();
+
+        while (reader.Read())
+        {
+            result.Add(new SimulationInfo
+            {
+                Id = reader.GetInt32(0),
+                Name = reader.GetString(1),
+                GConstant = reader.IsDBNull(2)
+                    ? 0f
+                    : (float)reader.GetDouble(2),
+                CreatedAt = reader.IsDBNull(3)
+                    ? DateTime.MinValue
+                    : DateTime.Parse(reader.GetString(3))
+            });
+        }
+
+        return result;
+    }
+
+    public static bool DeleteSimulation(int simulationId)
+    {
+        using var connection = new SqliteConnection(ConnectionString);
+        connection.Open();
+
+        using var transaction = connection.BeginTransaction();
+
+        try
+        {
+            // 1. Delete objects belonging to the simulation
+            using (var objCmd = connection.CreateCommand())
+            {
+                objCmd.CommandText = """
+                DELETE FROM objects
+                WHERE simulation_id = $sid;
+            """;
+                objCmd.Parameters.AddWithValue("$sid", simulationId);
+                objCmd.ExecuteNonQuery();
+            }
+
+            // 2. Delete the simulation itself
+            int rowsAffected;
+            using (var simCmd = connection.CreateCommand())
+            {
+                simCmd.CommandText = """
+                DELETE FROM simulations
+                WHERE id = $sid;
+            """;
+                simCmd.Parameters.AddWithValue("$sid", simulationId);
+                rowsAffected = simCmd.ExecuteNonQuery();
+            }
+
+            // If no simulation row was deleted, ID didn't exist
+            if (rowsAffected == 0)
+            {
+                transaction.Rollback();
+                return false;
+            }
+
+            transaction.Commit();
+            return true;
+        }
+        catch (Exception e)
+        {
+            transaction.Rollback();
+            GD.PrintErr($"DeleteSimulation failed: {e.Message}");
+            return false;
+        }
+    }
+
+    public static void ClearCurrentSimulation(Node root)
+    {
+        if (root == null)
+            return;
+
+        var toDelete = new List<GvObject>();
+
+        foreach (Node child in root.GetChildren())
+        {
+            if (child is GvObject gv)
+                toDelete.Add(gv);
+        }
+
+        // Important: free after iteration
+        foreach (var gv in toDelete)
+            gv.QueueFree();
+
+        Globals.ClearAll();
     }
 }
