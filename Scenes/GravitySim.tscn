@@ -1,10 +1,12 @@
-[gd_scene load_steps=9 format=3 uid="uid://u18cry12m86n"]
+[gd_scene load_steps=11 format=3 uid="uid://u18cry12m86n"]
 
 [ext_resource type="Script" uid="uid://br3j5338eewqj" path="res://Scripts/ObjectScripts/GravitySim.cs" id="1_40fux"]
 [ext_resource type="Script" uid="uid://c4dtv147byhpr" path="res://Scripts/User.cs" id="2_upvvv"]
 [ext_resource type="PackedScene" uid="uid://r3pio231mw2r" path="res://Scenes/Objects/SpacetimeGrid.tscn" id="3_n7ccm"]
 [ext_resource type="PackedScene" uid="uid://btk22j7bntc6y" path="res://Scenes/Objects/GvObject.tscn" id="4_upvvv"]
 [ext_resource type="PackedScene" uid="uid://cerkvx2po5u4n" path="res://Scenes/Objects/UI.tscn" id="5_mrwfx"]
+[ext_resource type="Script" uid="uid://brsw7yf1xoqy0" path="res://Scripts/SkyboxLoader.cs" id="6_xf628"]
+[ext_resource type="Script" uid="uid://bevh2tlx8gsrq" path="res://Scripts/MusicManager.cs" id="7_v4cm8"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_upvvv"]
 sky_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
@@ -52,3 +54,9 @@ Mass = 100.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -10)
 InitialVelocity = Vector3(2, 0, 0)
 Mass = 100.0
+
+[node name="SkyboxLoader" type="Node3D" parent="."]
+script = ExtResource("6_xf628")
+
+[node name="MusicManager" type="Node3D" parent="."]
+script = ExtResource("7_v4cm8")
