@@ -23,6 +23,7 @@ public partial class GvObject : Node3D
     public float Radius { get; private set; }
     public Vector3 Velocity { get; set; }
     public bool IsSelected { get; private set; }
+    public int MeshId { get; private set; } = -1;
 
     private MeshInstance3D _meshInstance;
     private OmniLight3D _light;
@@ -38,6 +39,7 @@ public partial class GvObject : Node3D
 
         // sanity check collision mask and layer
         _body = GetNode<StaticBody3D>("StaticBody3D");
+        _body.SetMeta("owner", this);
         _body.CollisionMask = 1;
         _body.CollisionLayer = 1;
 
@@ -100,6 +102,24 @@ public partial class GvObject : Node3D
             : _baseMaterial;
     }
 
+    public void ApplyMesh(int meshId)
+    {
+        string path = GvMeshLibrary.GetMeshPath(meshId);
+        if (string.IsNullOrEmpty(path))
+            return;
+
+        var scene = ResourceLoader.Load<PackedScene>(path);
+        if (scene == null)
+            return;
+
+        var node = scene.Instantiate<Node3D>();
+
+        _meshInstance?.QueueFree();
+        AddChild(node);
+
+        MeshId = meshId;
+    }
+
     private void UpdateGvObject()
     {
         // R = (3M / (4πρ))^(1/3)
@@ -112,7 +132,11 @@ public partial class GvObject : Node3D
         if (_meshInstance != null)
             _meshInstance.Scale = Vector3.One * Radius;
         if (_body != null)
-            _body.Scale = Vector3.One * Radius;
+        {
+            var shape = _body.GetNode<CollisionShape3D>("CollisionShape3D");
+            shape.Scale = Vector3.One * Radius;
+
+        }
         if (_light != null)
         {
             _light.OmniRange = Radius * 4f;

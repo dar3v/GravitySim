@@ -174,8 +174,11 @@ public partial class User : Camera3D
 
         Node node = hit["collider"].As<Node>();
 
-        while (node != null && node is not GvObject)
-            node = node.GetParent();
+        if (hit["collider"].As<Node>() is Node collider &&
+            collider.HasMeta("owner"))
+        {
+            SetSelectedObject((GvObject)collider.GetMeta("owner"));
+        }
 
         if (node is GvObject gv)
         {

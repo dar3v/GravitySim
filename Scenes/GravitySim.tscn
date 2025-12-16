@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://br3j5338eewqj" path="res://Scripts/ObjectScripts/GravitySim.cs" id="1_40fux"]
 [ext_resource type="Script" uid="uid://c4dtv147byhpr" path="res://Scripts/User.cs" id="2_upvvv"]
+[ext_resource type="Script" uid="uid://bmp1idabpdm1c" path="res://Scripts/Globals.cs" id="2_xf628"]
 [ext_resource type="PackedScene" uid="uid://r3pio231mw2r" path="res://Scenes/Objects/SpacetimeGrid.tscn" id="3_n7ccm"]
 [ext_resource type="PackedScene" uid="uid://ctoyatgj0hb2c" path="res://Scenes/Objects/WorldEnvironment.tscn" id="3_wdyf8"]
 [ext_resource type="PackedScene" uid="uid://btk22j7bntc6y" path="res://Scenes/Objects/GvObject.tscn" id="4_upvvv"]
@@ -11,6 +12,9 @@
 
 [node name="GravitySim" type="Node3D"]
 script = ExtResource("1_40fux")
+
+[node name="Node" type="Node" parent="."]
+script = ExtResource("2_xf628")
 
 [node name="UI" parent="." instance=ExtResource("5_mrwfx")]
 visible = false
