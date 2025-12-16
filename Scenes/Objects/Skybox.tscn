@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://c6d8cg6ofh8du"]
+
+[ext_resource type="Script" path="res://Scripts/SkyboxLoader.cs" id="1_if1jy"]
+
+[node name="SkyboxLoader" type="Node3D"]
+script = ExtResource("1_if1jy")

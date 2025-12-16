@@ -5,8 +5,6 @@
 [resource]
 render_priority = 0
 shader = ExtResource("1_ov3iv")
-shader_parameter/cell_size = 0.0
-shader_parameter/camera_pos = Vector3(0, 0, 0)
 shader_parameter/object_count = 0
 shader_parameter/object_positions = PackedVector3Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 shader_parameter/object_masses = PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
