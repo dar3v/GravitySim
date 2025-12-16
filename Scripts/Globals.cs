@@ -12,6 +12,12 @@ public partial class Globals : Node
     public static event Action ObjectsChanged;
     private static readonly List<GvObject> _gvObjects = [];
 
+    public override void _Ready()
+    {
+        GvDatabase.Initialize();
+        GD.Print("Initialized Database");
+    }
+
     public static void AddGvObject(GvObject gvObject)
     {
         if (!_gvObjects.Contains(gvObject))
