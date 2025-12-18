@@ -1,32 +1,30 @@
 using Godot;
 using System;
 
-/// <summary>
-/// Simple OOP music manager for Godot C#.
-/// - Loads an audio file at runtime (mp3/ogg/wav)
-/// - Plays it and optionally loops it
-/// - Exposes Play/Stop/SetVolume methods and a singleton Instance
-/// </summary>
+// Manages background music playback
 public partial class MusicManager : Node
 {
-	// Path to your mp3 file. Set this in the Inspector or leave default.
+	// Path to the background music file
 	[Export]
 	public string MusicPath { get; set; } = "res://Assets/space.mp3";
 
+	// Volume level in decibels
 	[Export]
 	public float VolumeDb { get; set; } = -3f;
 
+	// Enable or disable looping
 	[Export]
 	public bool Loop { get; set; } = true;
 
+	// Audio player instance
 	private AudioStreamPlayer _player;
 
-	// Optional: global access to the music manager (singleton pattern)
+	// Singleton instance for global access
 	public static MusicManager Instance { get; private set; }
 
 	public override void _EnterTree()
 	{
-		// Enforce single instance if multiple added accidentally
+		// Ensure only one MusicManager exists
 		if (Instance != null && Instance != this)
 		{
 			QueueFree();
@@ -37,10 +35,11 @@ public partial class MusicManager : Node
 
 	public override void _Ready()
 	{
-		// Create an AudioStreamPlayer at runtime and attach to this node.
+		// Create and attach the audio player
 		_player = new AudioStreamPlayer();
 		AddChild(_player);
 
+		// Load the music file
 		var stream = GD.Load<AudioStream>(MusicPath);
 		if (stream == null)
 		{
@@ -48,45 +47,49 @@ public partial class MusicManager : Node
 			return;
 		}
 
+		// Apply audio settings
 		_player.Stream = stream;
 		_player.VolumeDb = VolumeDb;
 
-		// If Loop is requested, re-play when finished (robust regardless of import settings).
+		// Restart music when it finishes (looping)
 		if (Loop)
 		{
-			// Connect finished signal -> restart playback
 			_player.Connect("finished", new Callable(this, nameof(OnFinished)));
 		}
 
+		// Start playing music
 		_player.Play();
 	}
 
+	// Called when the music finishes
 	private void OnFinished()
 	{
-		// Restart playback for looping
 		if (_player != null)
 			_player.Play();
 	}
 
-	// --- OOP-friendly API ---
+	// Play the background music
 	public void PlayMusic()
 	{
 		if (_player != null && !_player.Playing)
 			_player.Play();
 	}
 
+	// Stop the background music
 	public void StopMusic()
 	{
 		if (_player != null && _player.Playing)
 			_player.Stop();
 	}
 
+	// Change the music volume
 	public void SetVolumeDb(float db)
 	{
 		if (_player != null)
 			_player.VolumeDb = db;
 	}
 
+	// Check if music is currently playing
 	public bool IsPlaying()
 	{
 		return _player != null && _player.Playing;
@@ -94,6 +97,7 @@ public partial class MusicManager : Node
 
 	public override void _ExitTree()
 	{
+		// Clear singleton when node is removed
 		if (Instance == this)
 			Instance = null;
 	}

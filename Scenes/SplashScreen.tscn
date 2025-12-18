@@ -1,0 +1,28 @@
+[gd_scene load_steps=3 format=3 uid="uid://ck2ju8yyrbbyi"]
+
+[ext_resource type="Texture2D" uid="uid://dlk22nahxdmnx" path="res://Assets/gravitysplash.svg" id="1_acvwv"]
+[ext_resource type="Script" uid="uid://ch8j0gkfe7ysq" path="res://Scripts/Splash/SplashScreen.cs" id="1_lus2m"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_lus2m")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="CenterContainer" type="CenterContainer" parent="ColorRect"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="TextureRect" type="TextureRect" parent="ColorRect/CenterContainer"]
+layout_mode = 2
+texture = ExtResource("1_acvwv")
+
+[node name="ProgressBar" type="ProgressBar" parent="ColorRect"]
+layout_mode = 0
+offset_right = 4.0
+offset_bottom = 27.0
