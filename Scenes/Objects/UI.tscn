@@ -2,8 +2,11 @@
 
 [ext_resource type="Script" uid="uid://bxnxhtqqm1rcj" path="res://Scripts/ObjectScripts/MainUi.cs" id="1_up3fk"]
 
-[node name="MainUI" type="CanvasLayer" node_paths=PackedStringArray("_objectList", "_addObject")]
+[node name="MainUI" type="CanvasLayer" node_paths=PackedStringArray("_saveMenu", "_loadMenu", "_simMenu", "_objectList", "_addObject")]
 script = ExtResource("1_up3fk")
+_saveMenu = NodePath("VBox/TopBar/TopBarHBox/SaveMenu")
+_loadMenu = NodePath("VBox/TopBar/TopBarHBox/LoadMenu")
+_simMenu = NodePath("VBox/TopBar/TopBarHBox/SimButton")
 _objectList = NodePath("VBox/Body/Sidebar/SidebarVBox/ObjectList")
 _addObject = NodePath("VBox/Body/Sidebar/SidebarVBox/AddObject")
 
@@ -22,7 +25,7 @@ size_flags_vertical = 0
 [node name="TopBarHBox" type="HBoxContainer" parent="VBox/TopBar"]
 layout_mode = 2
 
-[node name="SaveMenu" type="MenuButton" parent="VBox/TopBar/TopBarHBox"]
+[node name="SaveMenu" type="Button" parent="VBox/TopBar/TopBarHBox"]
 layout_mode = 2
 text = "Save"
 

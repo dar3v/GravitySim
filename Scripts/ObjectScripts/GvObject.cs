@@ -32,8 +32,12 @@ public partial class GvObject : Node3D
     private StandardMaterial3D _selectionMaterial;
     private StaticBody3D _body;
 
+    private Vector3 _initialPosition;
+
     public override void _Ready()
     {
+        _initialPosition = GlobalPosition;
+
         _meshInstance = GetNodeOrNull<MeshInstance3D>("Mesh");
         if (_meshInstance == null)
         {
@@ -69,6 +73,14 @@ public partial class GvObject : Node3D
     {
         if (GetChildCount() == 0)
             GD.PushWarning($"{Name} instantiated without children. Use PackedScene.");
+    }
+
+    public void ResetState()
+    {
+        GlobalPosition = _initialPosition;
+        Velocity = InitialVelocity;
+        Mass = Mass;
+        Density = Density;
     }
 
     private void SetupMaterials()
@@ -158,6 +170,5 @@ public partial class GvObject : Node3D
             _light.OmniRange = Radius * 4f;
             _light.LightEnergy = Mathf.Log(_mass + 1f);
         }
-
     }
 }

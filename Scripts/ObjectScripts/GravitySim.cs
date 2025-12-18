@@ -4,14 +4,25 @@ using System.Collections.Generic;
 public partial class GravitySim : Node3D
 {
     [Export] public float G = 1.0f;
-    [Export] public float Softening = 0.01f;
+
+    // Increased softening for real-time stability
+    [Export] public float Softening = 0.5f;
+
     [Export] public bool RemoveCenterOfMassDrift = true;
 
+    // Safety limits
+    [Export] public float MaxAcceleration = 1000f;
+    [Export] public float MaxVelocity = 500f;
+
     private Vector3[] _accelerations;
+    private int _comFrameCounter = 0;
 
     public override void _PhysicsProcess(double delta)
     {
-        float dt = (float)delta;
+        if (Globals.SimulationPaused)
+          return;
+
+        float dt = Mathf.Min((float)delta, 1f / 30f);
 
         List<GvObject> objs = Globals.GetAllGvObjects();
         int count = objs.Count;
@@ -20,33 +31,45 @@ public partial class GravitySim : Node3D
 
         EnsureAccelerationBuffer(count);
 
-        // --- First acceleration pass ---
         ComputeAccelerations(objs);
 
-        // --- Half-step velocity update ---
+        // Half-step velocity
         for (int i = 0; i < count; i++)
             objs[i].Velocity += _accelerations[i] * (0.5f * dt);
 
-        // --- Position update ---
+        // Position update
         for (int i = 0; i < count; i++)
             objs[i].GlobalPosition += objs[i].Velocity * dt;
 
-        // --- Recompute accelerations ---
         ComputeAccelerations(objs);
 
-        // --- Final velocity update ---
+        // Final velocity update + clamp
         for (int i = 0; i < count; i++)
+        {
             objs[i].Velocity += _accelerations[i] * (0.5f * dt);
 
-        if (RemoveCenterOfMassDrift)
+            if (objs[i].Velocity.Length() > MaxVelocity)
+                objs[i].Velocity =
+                    objs[i].Velocity.Normalized() * MaxVelocity;
+        }
+
+        // Apply COM stabilization only occasionally
+        if (RemoveCenterOfMassDrift && (++_comFrameCounter % 10 == 0))
             StabilizeCenterOfMass(objs);
+    }
+
+    public static void ResetSimulation()
+    {
+        foreach (var obj in Globals.GetAllGvObjects())
+        {
+            obj.ResetState();
+        }
+        GD.Print("Simulation Reset (soft)");
     }
 
     private void ComputeAccelerations(List<GvObject> objs)
     {
         int count = objs.Count;
-
-        // Clear acceleration buffer
         for (int i = 0; i < count; i++)
             _accelerations[i] = Vector3.Zero;
 
@@ -54,23 +77,28 @@ public partial class GravitySim : Node3D
 
         for (int i = 0; i < count; i++)
         {
-            GvObject a = objs[i];
+            var a = objs[i];
 
             for (int j = i + 1; j < count; j++)
             {
-                GvObject b = objs[j];
+                var b = objs[j];
 
-                Vector3 offset = b.GlobalPosition - a.GlobalPosition;
-                float distSq = offset.LengthSquared() + softSq;
+                Vector3 r = b.GlobalPosition - a.GlobalPosition;
+                float distSq = r.LengthSquared() + softSq;
 
-                float dist = Mathf.Sqrt(distSq);
-                float invDist = 1.0f / dist;
+                float invDist = 1.0f / Mathf.Sqrt(distSq);
                 float invDist3 = invDist * invDist * invDist;
 
-                Vector3 forceDir = offset * invDist3;
+                Vector3 acc = r * invDist3;
 
-                Vector3 accA = forceDir * (G * b.Mass);
-                Vector3 accB = forceDir * (G * a.Mass);
+                Vector3 accA = acc * (G * b.Mass);
+                Vector3 accB = acc * (G * a.Mass);
+
+                // Clamp acceleration
+                if (accA.Length() > MaxAcceleration)
+                    accA = accA.Normalized() * MaxAcceleration;
+                if (accB.Length() > MaxAcceleration)
+                    accB = accB.Normalized() * MaxAcceleration;
 
                 _accelerations[i] += accA;
                 _accelerations[j] -= accB;

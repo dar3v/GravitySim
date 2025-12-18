@@ -13,7 +13,6 @@ float curvature(vec3 p) {
         float rs = object_masses[i] * curvature_scale;
         if (r >= rs)
             h += 2.0 * sqrt(rs * (r - rs));  // Schwarzschild curvature formula
-            h += rs / (r + 0.1);
     }
     return h;
 }

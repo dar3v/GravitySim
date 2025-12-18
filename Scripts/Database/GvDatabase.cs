@@ -338,21 +338,6 @@ public static class GvDatabase
 
     public static void ClearCurrentSimulation(Node root)
     {
-        if (root == null)
-            return;
-
-        var toDelete = new List<GvObject>();
-
-        foreach (Node child in root.GetChildren())
-        {
-            if (child is GvObject gv)
-                toDelete.Add(gv);
-        }
-
-        // Important: free after iteration
-        foreach (var gv in toDelete)
-            gv.QueueFree();
-
-        Globals.ClearAll();
+        Globals.ClearSimulation(root);
     }
 }

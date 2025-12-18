@@ -1,8 +1,9 @@
-[gd_scene load_steps=10 format=3 uid="uid://u18cry12m86n"]
+[gd_scene load_steps=11 format=3 uid="uid://u18cry12m86n"]
 
 [ext_resource type="Script" uid="uid://br3j5338eewqj" path="res://Scripts/ObjectScripts/GravitySim.cs" id="1_40fux"]
-[ext_resource type="Script" uid="uid://clwmhwkmrbbmg" path="res://Scripts/Debugger.cs" id="2_86342"]
+[ext_resource type="Script" uid="uid://bmp1idabpdm1c" path="res://Scripts/Globals.cs" id="2_86342"]
 [ext_resource type="Script" uid="uid://c4dtv147byhpr" path="res://Scripts/User.cs" id="2_upvvv"]
+[ext_resource type="Script" uid="uid://clwmhwkmrbbmg" path="res://Scripts/Debugger.cs" id="3_mr2dc"]
 [ext_resource type="PackedScene" uid="uid://r3pio231mw2r" path="res://Scenes/Objects/SpacetimeGrid.tscn" id="3_n7ccm"]
 [ext_resource type="PackedScene" uid="uid://ctoyatgj0hb2c" path="res://Scenes/Objects/WorldEnvironment.tscn" id="3_wdyf8"]
 [ext_resource type="PackedScene" uid="uid://btk22j7bntc6y" path="res://Scenes/Objects/GvObject.tscn" id="4_upvvv"]
@@ -14,20 +15,18 @@
 script = ExtResource("1_40fux")
 Softening = 0.1
 
-[node name="Node" type="Node" parent="." node_paths=PackedStringArray("GravitySim", "WorldRoot")]
+[node name="Globals" type="Node" parent="."]
 script = ExtResource("2_86342")
-GravitySim = NodePath("..")
-WorldRoot = NodePath("..")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Node"]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
 visible = false
 shadow_enabled = true
 sky_mode = 1
 
-[node name="UI" parent="Node" instance=ExtResource("5_mrwfx")]
-
 [node name="WorldEnvironment" parent="." instance=ExtResource("3_wdyf8")]
+
+[node name="UI" parent="." instance=ExtResource("5_mrwfx")]
 
 [node name="User" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 5)
@@ -40,13 +39,18 @@ GridResolution = 75
 PlaneSize = 100.0
 
 [node name="GvObject" parent="." instance=ExtResource("4_upvvv")]
+InitialVelocity = Vector3(-2, 0, 0)
 Mass = 100.0
 
 [node name="GvObject2" parent="." instance=ExtResource("4_upvvv")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -10)
-InitialVelocity = Vector3(2, 0, 0)
 Mass = 100.0
 
 [node name="SkyboxLoader" parent="." instance=ExtResource("7_wdyf8")]
 
 [node name="MusicManager" parent="." instance=ExtResource("8_86342")]
+
+[node name="Debugger" type="Node" parent="." node_paths=PackedStringArray("GravitySim", "WorldRoot")]
+script = ExtResource("3_mr2dc")
+GravitySim = NodePath("..")
+WorldRoot = NodePath("..")

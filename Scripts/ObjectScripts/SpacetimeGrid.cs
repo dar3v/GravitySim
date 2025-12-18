@@ -43,6 +43,9 @@ public partial class SpacetimeGrid : MeshInstance3D
 
     public override void _Process(double delta)
     {
+        if (Globals.SimulationPaused)
+            return;
+
         // Ensure gridMaterial is not null before using it
         if (gridMaterial != null)
         {
@@ -73,6 +76,7 @@ public partial class SpacetimeGrid : MeshInstance3D
         {
             GD.PrintErr("Shader material is not set!");
         }
+
     }
 
     private void GenerateGridMesh()

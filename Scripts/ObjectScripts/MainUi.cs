@@ -4,7 +4,7 @@ using System;
 public partial class MainUi : CanvasLayer
 {
     // MenuButtons
-    [Export] private MenuButton _saveMenu;
+    [Export] private Button _saveMenu;
     [Export] private MenuButton _loadMenu;
     [Export] private MenuButton _simMenu;
 
@@ -15,18 +15,23 @@ public partial class MainUi : CanvasLayer
     public override void _Ready()
     {
         // Get the popups
-        var savePopup = _saveMenu.GetPopup();
-        var loadPopup = _saveMenu.GetPopup();
+        var loadPopup = _loadMenu.GetPopup();
+        var simPopup = _simMenu.GetPopup();
 
-        // Add items
-        // savePopup.AddItem("Save Simulation", 0);
-
+        // load buttons
         loadPopup.AddItem("Load Simulation", 1);
         loadPopup.AddItem("Delete Simulation", 2);
 
+        // sim buttons
+        simPopup.AddItem("Pause Simulation", 1);
+        simPopup.AddItem("Reset Simulation", 2);
+        simPopup.AddItem("Clear Simulation", 3);
+
         // Subscribe to events
+        _saveMenu.Pressed += OnSaveMenuPressed;
         loadPopup.IndexPressed += OnLoadMenuPressed;
-        _addObject.Pressed += ShowAddObjectDialog;
+        simPopup.IndexPressed += OnSimMenuPressed;
+        _addObject.Pressed += OnAddObjectPressed;
         Globals.ObjectsChanged += UpdateObjectList;
     }
 
@@ -34,6 +39,232 @@ public partial class MainUi : CanvasLayer
     {
         // Unsubscribe when this node is removed
         Globals.ObjectsChanged -= UpdateObjectList;
+    }
+
+    private void OnSaveMenuPressed()
+    {
+        var dialog = new ConfirmationDialog();
+        dialog.Title = "Save Simulation";
+        dialog.Size = new Vector2I(400, 200);
+
+        var vbox = new VBoxContainer();
+
+        // Simulation name
+        vbox.AddChild(new Label { Text = "Simulation Name:" });
+        var nameInput = new LineEdit { PlaceholderText = "Enter name" };
+        vbox.AddChild(nameInput);
+
+        // Info
+        var objectCount = Globals.GetAllGvObjects().Count;
+        vbox.AddChild(new Label { Text = $"Objects to save: {objectCount}" });
+
+        dialog.AddChild(vbox);
+
+        dialog.Confirmed += () =>
+        {
+            if (string.IsNullOrWhiteSpace(nameInput.Text))
+            {
+                ShowMessage("Please enter a valid name");
+                return;
+            }
+
+            try
+            {
+                GvDatabase.SaveSimulation(nameInput.Text, Globals.G, Globals.GetAllGvObjects());
+                ShowMessage($"Simulation '{nameInput.Text}' saved successfully!");
+            }
+            catch (Exception ex)
+            {
+                ShowMessage($"Error saving: {ex.Message}");
+            }
+
+            dialog.QueueFree();
+        };
+
+        dialog.CloseRequested += dialog.QueueFree;
+
+        AddChild(dialog);
+        dialog.PopupCentered();
+    }
+
+    private void ShowMessage(string message)
+    {
+        var msgDialog = new AcceptDialog();
+        msgDialog.DialogText = message;
+        msgDialog.CloseRequested += msgDialog.QueueFree;
+        AddChild(msgDialog);
+        msgDialog.PopupCentered();
+    }
+
+
+    private void OnLoadMenuPressed(long index)
+    {
+        GD.Print($"File menu item {index} pressed");
+
+        switch (index)
+        {
+            case 0: // Load
+                ShowLoadDialog();
+                break;
+            case 1: // Delete
+                ShowDeleteDialog();
+                break;
+        }
+    }
+
+    private void OnSimMenuPressed(long index)
+    {
+        GD.Print($"Simulation menu item {index} pressed");
+
+        switch (index)
+        {
+            case 0: // Pause
+                Globals.TogglePaused();
+                break;
+            case 1: // Reset
+                GravitySim.ResetSimulation();
+                break;
+            case 2: // Clear
+                Globals.ClearSimulation(GetTree().CurrentScene);
+                break;
+        }
+    }
+
+    private void ShowLoadDialog()
+    {
+        var simulations = GvDatabase.ListSimulations();
+
+        if (simulations.Count == 0)
+        {
+            ShowMessage("No saved simulations found");
+            return;
+        }
+
+        var dialog = new ConfirmationDialog();
+        dialog.Title = "Load Simulation";
+        dialog.Size = new Vector2I(500, 400);
+
+        var vbox = new VBoxContainer();
+
+        vbox.AddChild(new Label { Text = "Select a simulation to load:" });
+
+        var list = new ItemList();
+        list.CustomMinimumSize = new Vector2(0, 300);
+
+        foreach (var sim in simulations)
+        {
+            string displayText = $"{sim.Name} | G={sim.GConstant:F4} | {sim.CreatedAt:yyyy-MM-dd HH:mm}";
+            list.AddItem(displayText);
+            list.SetItemMetadata(list.ItemCount - 1, sim.Id);
+        }
+
+        vbox.AddChild(list);
+        dialog.AddChild(vbox);
+
+        dialog.Confirmed += () =>
+        {
+            if (list.GetSelectedItems().Length > 0)
+            {
+                int selectedIndex = list.GetSelectedItems()[0];
+                int simId = (int)list.GetItemMetadata(selectedIndex);
+                LoadSimulation(simId);
+            }
+            dialog.QueueFree();
+        };
+
+        dialog.CloseRequested += dialog.QueueFree;
+
+        AddChild(dialog);
+        dialog.PopupCentered();
+    }
+
+    private void LoadSimulation(int simulationId)
+    {
+        try
+        {
+            // Find parent node
+            var root = GetTree().Root;
+            Node3D parent = null;
+
+            foreach (Node child in root.GetChildren())
+            {
+                if (child is Node3D node3d && child.Name != "MainUI")
+                {
+                    parent = node3d;
+                    break;
+                }
+            }
+
+            if (parent == null)
+            {
+                ShowMessage("Error: No suitable parent node found");
+                return;
+            }
+
+            GvDatabase.LoadSimulation(simulationId, null, parent);
+            ShowMessage("Simulation loaded successfully!");
+        }
+        catch (Exception ex)
+        {
+            ShowMessage($"Error loading: {ex.Message}");
+            GD.PrintErr($"Load error: {ex}");
+        }
+    }
+    private void ShowDeleteDialog()
+    {
+        var simulations = GvDatabase.ListSimulations();
+
+        if (simulations.Count == 0)
+        {
+            ShowMessage("No saved simulations found");
+            return;
+        }
+
+        var dialog = new ConfirmationDialog();
+        dialog.Title = "Delete Simulation";
+        dialog.OkButtonText = "Delete";
+        dialog.Size = new Vector2I(500, 400);
+
+        var vbox = new VBoxContainer();
+
+        vbox.AddChild(new Label { Text = "⚠️ Select a simulation to DELETE (cannot be undone):" });
+
+        var list = new ItemList();
+        list.CustomMinimumSize = new Vector2(0, 300);
+
+        foreach (var sim in simulations)
+        {
+            string displayText = $"{sim.Name} | {sim.CreatedAt:yyyy-MM-dd HH:mm}";
+            list.AddItem(displayText);
+            list.SetItemMetadata(list.ItemCount - 1, sim.Id);
+        }
+
+        vbox.AddChild(list);
+        dialog.AddChild(vbox);
+
+        dialog.Confirmed += () =>
+        {
+            if (list.GetSelectedItems().Length > 0)
+            {
+                int selectedIndex = list.GetSelectedItems()[0];
+                int simId = (int)list.GetItemMetadata(selectedIndex);
+
+                if (GvDatabase.DeleteSimulation(simId))
+                {
+                    ShowMessage("Simulation deleted successfully!");
+                }
+                else
+                {
+                    ShowMessage("Error deleting simulation");
+                }
+            }
+            dialog.QueueFree();
+        };
+
+        dialog.CloseRequested += dialog.QueueFree;
+
+        AddChild(dialog);
+        dialog.PopupCentered();
     }
 
     private void UpdateObjectList()
@@ -49,22 +280,7 @@ public partial class MainUi : CanvasLayer
         }
     }
 
-    private void OnLoadMenuPressed(long index)
-    {
-        GD.Print($"File menu item {index} pressed");
-
-        switch (index)
-        {
-            case 0: // Save
-                break;
-            case 1: // Load
-                break;
-            case 2: // Delete
-                break;
-        }
-    }
-
-    private void ShowAddObjectDialog()
+    private void OnAddObjectPressed()
     {
         var dialog = new ConfirmationDialog();
         dialog.Title = "Add Object";
