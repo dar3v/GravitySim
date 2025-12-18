@@ -169,13 +169,13 @@ public static class GvDatabase
 
         var cmd = connection.CreateCommand();
         cmd.CommandText = """
-        SELECT
-            name, mass, density,
-            pos_x, pos_y, pos_z,
-            vel_x, vel_y, vel_z
-        FROM objects
-        WHERE simulation_id = $sid;
-        """;
+    SELECT
+        name, mass, density,
+        pos_x, pos_y, pos_z,
+        vel_x, vel_y, vel_z
+    FROM objects
+    WHERE simulation_id = $sid;
+    """;
         cmd.Parameters.AddWithValue("$sid", simulationId);
 
         using var reader = cmd.ExecuteReader();
@@ -183,22 +183,24 @@ public static class GvDatabase
         while (reader.Read())
         {
             var obj = gvScene.Instantiate<GvObject>();
-            parent.AddChild(obj);
 
             obj.Name = reader.GetString(0);
             obj.Mass = reader.GetFloat(1);
             obj.Density = reader.GetFloat(2);
 
+            // Set InitialVelocity BEFORE adding to tree
+            obj.InitialVelocity = new Vector3(
+                reader.GetFloat(6),
+                reader.GetFloat(7),
+                reader.GetFloat(8)
+            );
+
+            parent.AddChild(obj);
+
             obj.GlobalPosition = new Vector3(
                 reader.GetFloat(3),
                 reader.GetFloat(4),
                 reader.GetFloat(5)
-            );
-
-            obj.Velocity = new Vector3(
-                reader.GetFloat(6),
-                reader.GetFloat(7),
-                reader.GetFloat(8)
             );
         }
 
@@ -320,6 +322,18 @@ public static class GvDatabase
             GD.PrintErr($"DeleteSimulation failed: {e.Message}");
             return false;
         }
+    }
+
+    public static void ResetDatabase()
+    {
+        if (File.Exists(DbPath))
+        {
+            File.Delete(DbPath);
+            GD.Print("Database deleted");
+        }
+
+        Initialize(); // Recreate fresh database
+        GD.Print("Database reset complete");
     }
 
     public static void ClearCurrentSimulation(Node root)
