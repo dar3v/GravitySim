@@ -175,7 +175,7 @@ public static class GvDatabase
             vel_x, vel_y, vel_z
         FROM objects
         WHERE simulation_id = $sid;
-    """;
+        """;
         cmd.Parameters.AddWithValue("$sid", simulationId);
 
         using var reader = cmd.ExecuteReader();
@@ -241,6 +241,35 @@ public static class GvDatabase
         }
 
         return result;
+    }
+
+    /* ts vibe coded ahh hell bruh 💔 */
+
+    public static bool RenameSimulation(int simulationId, string newName)
+    {
+        if (string.IsNullOrWhiteSpace(newName))
+        {
+            GD.PrintErr("RenameSimulation failed: name is empty.");
+            return false;
+        }
+
+        using var connection = new SqliteConnection(ConnectionString);
+        connection.Open();
+
+        using var cmd = connection.CreateCommand();
+        cmd.CommandText = """
+        UPDATE simulations
+        SET name = $name
+        WHERE id = $id;
+    """;
+
+        cmd.Parameters.AddWithValue("$name", newName.Trim());
+        cmd.Parameters.AddWithValue("$id", simulationId);
+
+        int rowsAffected = cmd.ExecuteNonQuery();
+
+        // rowsAffected == 0 means the simulation ID does not exist
+        return rowsAffected > 0;
     }
 
     public static bool DeleteSimulation(int simulationId)
