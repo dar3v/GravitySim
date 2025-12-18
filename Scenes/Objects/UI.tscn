@@ -2,9 +2,8 @@
 
 [ext_resource type="Script" uid="uid://bxnxhtqqm1rcj" path="res://Scripts/ObjectScripts/MainUi.cs" id="1_up3fk"]
 
-[node name="MainUI" type="CanvasLayer" node_paths=PackedStringArray("_fileMenu", "_objectList", "_addObject")]
+[node name="MainUI" type="CanvasLayer" node_paths=PackedStringArray("_objectList", "_addObject")]
 script = ExtResource("1_up3fk")
-_fileMenu = NodePath("VBox/TopBar/TopBarHBox/FileMenu")
 _objectList = NodePath("VBox/Body/Sidebar/SidebarVBox/ObjectList")
 _addObject = NodePath("VBox/Body/Sidebar/SidebarVBox/AddObject")
 
@@ -23,13 +22,18 @@ size_flags_vertical = 0
 [node name="TopBarHBox" type="HBoxContainer" parent="VBox/TopBar"]
 layout_mode = 2
 
-[node name="FileMenu" type="MenuButton" parent="VBox/TopBar/TopBarHBox"]
+[node name="SaveMenu" type="MenuButton" parent="VBox/TopBar/TopBarHBox"]
 layout_mode = 2
-text = "File"
+text = "Save"
 
-[node name="ObjectMenu" type="MenuButton" parent="VBox/TopBar/TopBarHBox"]
+[node name="LoadMenu" type="MenuButton" parent="VBox/TopBar/TopBarHBox"]
 layout_mode = 2
-text = "Object"
+text = "Load
+"
+
+[node name="SimButton" type="MenuButton" parent="VBox/TopBar/TopBarHBox"]
+layout_mode = 2
+text = "Simulation"
 
 [node name="Body" type="HBoxContainer" parent="VBox"]
 layout_mode = 2
