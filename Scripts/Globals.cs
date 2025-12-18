@@ -10,7 +10,7 @@ public partial class Globals : Node
     // public const float CSquared = 1.0f; // Speed of light squared
 
     public static event Action ObjectsChanged;
-    private static readonly List<GvObject> _gvObjects = [];
+    public static readonly List<GvObject> GvObjects = [];
 
     public override void _Ready()
     {
@@ -20,9 +20,9 @@ public partial class Globals : Node
 
     public static void AddGvObject(GvObject gvObject)
     {
-        if (!_gvObjects.Contains(gvObject))
+        if (!GvObjects.Contains(gvObject))
         {
-            _gvObjects.Add(gvObject);
+            GvObjects.Add(gvObject);
             GD.Print($"Registered GvObject: {gvObject.Name}");
             ObjectsChanged?.Invoke();
         }
@@ -30,17 +30,17 @@ public partial class Globals : Node
 
     public static void RmGvObject(GvObject gvObject)
     {
-        _gvObjects.Remove(gvObject);
+        GvObjects.Remove(gvObject);
     }
 
     public static List<GvObject> GetAllGvObjects()
     {
-        return _gvObjects;
+        return GvObjects;
     }
 
     public static void ClearAll()
     {
-        _gvObjects.Clear();
+        GvObjects.Clear();
         ObjectsChanged?.Invoke();
     }
 }
