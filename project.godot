@@ -11,9 +11,9 @@ config_version=5
 [application]
 
 config/name="GravitySim"
-run/main_scene="uid://ck2ju8yyrbbyi"
-config/features=PackedStringArray("4.5", "C#", "Forward Plus")
-boot_splash/bg_color=Color(0.015686275, 0.14117648, 0.20392157, 1)
+run/main_scene="uid://u18cry12m86n"
+config/features=PackedStringArray("4.4", "C#", "Forward Plus")
+boot_splash/bg_color=Color(0.0156863, 0.141176, 0.203922, 1)
 boot_splash/image="uid://jqvhalr2w1"
 config/icon="res://icon.svg"
 
