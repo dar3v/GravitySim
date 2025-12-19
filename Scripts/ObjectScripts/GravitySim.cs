@@ -31,8 +31,6 @@ public partial class GravitySim : Node3D
 
         EnsureAccelerationBuffer(count);
 
-        ComputeAccelerations(objs);
-
         // Half-step velocity
         for (int i = 0; i < count; i++)
             objs[i].Velocity += _accelerations[i] * (0.5f * dt);

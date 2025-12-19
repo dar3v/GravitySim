@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://r3pio231mw2r" path="res://Scenes/Objects/SpacetimeGrid.tscn" id="3_n7ccm"]
 [ext_resource type="PackedScene" uid="uid://ctoyatgj0hb2c" path="res://Scenes/Objects/WorldEnvironment.tscn" id="3_wdyf8"]
 [ext_resource type="PackedScene" uid="uid://btk22j7bntc6y" path="res://Scenes/Objects/GvObject.tscn" id="4_upvvv"]
-[ext_resource type="PackedScene" path="res://Scenes/Objects/UI.tscn" id="5_mrwfx"]
+[ext_resource type="PackedScene" uid="uid://b2pm2aaxkmtr6" path="res://Scenes/Objects/UI.tscn" id="5_mrwfx"]
 [ext_resource type="PackedScene" uid="uid://c6d8cg6ofh8du" path="res://Scenes/Objects/Skybox.tscn" id="7_wdyf8"]
 [ext_resource type="PackedScene" uid="uid://ck7re1p05mvie" path="res://Scenes/Objects/Music.tscn" id="8_86342"]
 
